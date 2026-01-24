@@ -1,0 +1,12 @@
+﻿
+
+l_english:
+ action_child_education_personality:0 "$influence_child_personality_interaction$"
+ action_child_education_personality_label:0 "Shape [ward|E] [personality_trait|E]s"
+ action_child_education_personality_desc:2 "You can pass on a [personality_trait|E] to your [ward|E] [recipient.GetUIName]."
+ action_child_education_personality_click:0 "#I $influence_child_personality_interaction$"
+
+ action_child_education_commander:0 "$influence_child_commander_interaction$"
+ action_child_education_commander_label:0 "Influence [ward|E]'s [commander_trait|E]s"
+ action_child_education_commander_desc:2 "You can pass on a [commander_trait|E] to your [ward|E] [recipient.GetUIName]."
+ action_child_education_commander_click:0 "#I $influence_child_commander_interaction_desc$"
