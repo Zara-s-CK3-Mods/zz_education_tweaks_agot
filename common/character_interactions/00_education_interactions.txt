@@ -2,7 +2,6 @@
 
 
 # Designate guardian and ward in your own court
-# This interaction is referenced in code! If it's renamed you have to ping a coder
 educate_child_interaction = {
 	category = interaction_category_friendly
 	common_interaction = yes
@@ -520,10 +519,10 @@ educate_child_interaction = {
 			NOT = { exists = var:hostage_travelling_to_warden }
 		}
 		# Guardian has too many students
-		num_of_relation_ward <= 2
+		num_of_relation_ward <= zz_valyria_max_wards
 		trigger_if = {
 			limit = { exists = var:character_requested_as_educator }
-			num_of_relation_ward <= 1
+			num_of_relation_ward <= zz_valyria_max_wards
 		}
 	}
 
@@ -571,6 +570,23 @@ educate_child_interaction = {
 		show_as_tooltip = {
 			scope:guardian  = { set_relation_ward = scope:ward }
 		}
+
+		#AGOT Added
+		if = {
+			limit = {
+				exists = scope:guardian_liege.house
+			}
+			scope:ward.house ?= {
+				change_house_relation_effect = {
+					HOUSE = scope:guardian_liege.house
+					VALUE = house_relation_improve_minor_value
+					REASON = offered_ward
+					CHAR = scope:guardian_liege
+					TARGET_CHAR = scope:ward
+					TITLE = scope:dummy_gender
+				}
+			}
+		}
 	}
 
 	auto_accept = yes
@@ -593,6 +609,13 @@ educate_child_interaction = {
 		current_description = {
 			first_valid = {
 				#AGOT Added for correct tooltips wrt HV conversion rules
+				triggered_desc = {
+					trigger = {
+						scope:secondary_actor = { culture = culture:high_valyrian }
+						scope:secondary_recipient = { dynasty ?= dynasty:dynn_Targaryen }
+					}
+					desc = EDUCATE_CHILD_OPTION_CONVERT_CULTURE_TT_TO_ACTOR
+				}
 				triggered_desc = {
 					trigger = {
 						has_game_rule = agot_hv_conversion_offshoots
@@ -1000,7 +1023,7 @@ offer_ward_interaction = {
 					#AGOT Modified
 					#is_adult = yes
 					is_physically_able_adult = yes
-					num_of_relation_ward < 2
+					num_of_relation_ward < zz_valyria_max_wards
 				}
 				add_to_list = characters
 			}
@@ -1009,7 +1032,7 @@ offer_ward_interaction = {
 					#AGOT Modified
 					#is_adult = yes
 					is_physically_able_adult = yes
-					num_of_relation_ward < 2
+					num_of_relation_ward < zz_valyria_max_wards
 					NOR = {
 						is_theocratic_lessee = yes
 						is_consort_of = scope:recipient
@@ -1415,6 +1438,18 @@ offer_ward_interaction = {
 			VALUE = miniscule_unity_gain
 			DESC = clan_unity_ward_offerage.desc
 			REVERSE_NON_HOUSE_TARGET = yes
+		}
+
+		#AGOT Added
+		scope:recipient.house ?= {
+			change_house_relation_effect = {
+				HOUSE = scope:ward.house
+				VALUE = agot_house_relation_improve_small_value
+				REASON = offered_ward 
+				CHAR = scope:ward
+				TARGET_CHAR = scope:recipient
+				TITLE = scope:dummy_gender
+			}
 		}
 	}
 
@@ -1936,6 +1971,13 @@ offer_ward_interaction = {
 		current_description = {
 			first_valid = {
 				#AGOT Added for correct tooltips wrt HV conversion rules
+				triggered_desc = {
+					trigger = {
+						scope:secondary_recipient = { culture = culture:high_valyrian }
+						scope:secondary_actor = { dynasty ?= dynasty:dynn_Targaryen }
+					}
+					desc = EDUCATE_CHILD_OPTION_CONVERT_CULTURE_TT_TO_RECIPIENT
+				}
 				triggered_desc = {
 					trigger = {
 						has_game_rule = agot_hv_conversion_offshoots
@@ -2634,7 +2676,7 @@ offer_guardianship_interaction = {
 
 		if = { #To block against too many wards
 			limit = {
-				scope:guardian = { num_of_relation_ward < 2	}
+				scope:guardian = { num_of_relation_ward < zz_valyria_max_wards	}
 			}
 
 			save_scope_value_as = { #To give right tooltip in char_interaction.0080
@@ -2665,6 +2707,23 @@ offer_guardianship_interaction = {
 			VALUE = miniscule_unity_gain
 			DESC = clan_unity_guardianship.desc
 			REVERSE_NON_HOUSE_TARGET = yes
+		}
+
+		#AGOT Added
+		if = {
+			limit = {
+				exists = scope:ward.house
+			}
+			scope:guardian.house ?= {
+				change_house_relation_effect = {
+					HOUSE = scope:ward.house
+					VALUE = agot_house_relation_improve_small_value
+					REASON = offered_guardianship_yay 
+					CHAR = scope:ward
+					TARGET_CHAR = scope:recipient
+					TITLE = scope:dummy_gender
+				}
+			}
 		}
 	}
 
@@ -3221,6 +3280,13 @@ offer_guardianship_interaction = {
 		current_description = {
 			first_valid = {
 				#AGOT Added for correct tooltips wrt HV conversion rules
+				triggered_desc = {
+					trigger = {
+						scope:secondary_actor = { culture = culture:high_valyrian }
+						scope:secondary_recipient = { dynasty ?= dynasty:dynn_Targaryen }
+					}
+					desc = EDUCATE_CHILD_OPTION_CONVERT_CULTURE_TT_TO_ACTOR
+				}
 				triggered_desc = {
 					trigger = {
 						has_game_rule = agot_hv_conversion_offshoots
@@ -3827,6 +3893,28 @@ remove_guardian_interaction = {
 				months = 3
 			}
 		}
+
+		#AGOT Added
+		if = {
+			limit = {
+				NOT = {
+					scope:actor.house = scope:recipient.house
+				}
+			}
+			custom_tooltip = {
+				text = agot_this_will_damage_relations_warning
+				scope:recipient.house ?= {
+					change_house_relation_effect = {
+						HOUSE = scope:actor.house
+						VALUE = agot_house_relation_damage_small_value
+						REASON = removed_guardianship 
+						CHAR = scope:recipient
+						TARGET_CHAR = scope:actor
+						TITLE = scope:dummy_gender
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -4124,6 +4212,35 @@ make_child_learn_language_interaction = {
 									AND = {
 										exists = court_position:court_tutor_court_position
 										court_position:court_tutor_court_position = {
+											aptitude:court_tutor_court_position = 0
+										}
+									}
+									AND = {
+										exists = court_position:court_guru_court_position
+										court_position:court_guru_court_position = {
+											aptitude:court_guru_court_position = 0
+										}
+									}
+								}
+							}
+						}
+						custom_tooltip = court_tutor_child_language_rank_1
+						hidden_effect = {
+							random_scheme = {
+								type = learn_language
+								add_scheme_modifier = {
+									type = court_tutor_child_language_rank_1_modifier
+								}
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							scope:actor = {
+								OR = {
+									AND = {
+										exists = court_position:court_tutor_court_position
+										court_position:court_tutor_court_position = {
 											aptitude:court_tutor_court_position = 1
 										}
 									}
@@ -4136,12 +4253,12 @@ make_child_learn_language_interaction = {
 								}
 							}
 						}
-						custom_tooltip = court_tutor_child_language_rank_1
+						custom_tooltip = court_tutor_child_language_rank_2
 						hidden_effect = {
 							random_scheme = {
 								type = learn_language
 								add_scheme_modifier = {
-									type = court_tutor_child_language_rank_1_modifier
+									type = court_tutor_child_language_rank_2_modifier
 								}
 							}
 						}
@@ -4165,12 +4282,12 @@ make_child_learn_language_interaction = {
 								}
 							}
 						}
-						custom_tooltip = court_tutor_child_language_rank_2
+						custom_tooltip = court_tutor_child_language_rank_3
 						hidden_effect = {
 							random_scheme = {
 								type = learn_language
 								add_scheme_modifier = {
-									type = court_tutor_child_language_rank_2_modifier
+									type = court_tutor_child_language_rank_3_modifier
 								}
 							}
 						}
@@ -4194,12 +4311,12 @@ make_child_learn_language_interaction = {
 								}
 							}
 						}
-						custom_tooltip = court_tutor_child_language_rank_3
+						custom_tooltip = court_tutor_child_language_rank_4
 						hidden_effect = {
 							random_scheme = {
 								type = learn_language
 								add_scheme_modifier = {
-									type = court_tutor_child_language_rank_3_modifier
+									type = court_tutor_child_language_rank_4_modifier
 								}
 							}
 						}
@@ -4218,35 +4335,6 @@ make_child_learn_language_interaction = {
 										exists = court_position:court_guru_court_position
 										court_position:court_guru_court_position = {
 											aptitude:court_guru_court_position = 4
-										}
-									}
-								}
-							}
-						}
-						custom_tooltip = court_tutor_child_language_rank_4
-						hidden_effect = {
-							random_scheme = {
-								type = learn_language
-								add_scheme_modifier = {
-									type = court_tutor_child_language_rank_4_modifier
-								}
-							}
-						}
-					}
-					else_if = {
-						limit = {
-							scope:actor = {
-								OR = {
-									AND = {
-										exists = court_position:court_tutor_court_position
-										court_position:court_tutor_court_position = {
-											aptitude:court_tutor_court_position = 5
-										}
-									}
-									AND = {
-										exists = court_position:court_guru_court_position
-										court_position:court_guru_court_position = {
-											aptitude:court_guru_court_position = 5
 										}
 									}
 								}
