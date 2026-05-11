@@ -522,7 +522,7 @@ educate_child_interaction = {
 		num_of_relation_ward <= zz_valyria_max_wards
 		trigger_if = {
 			limit = { exists = var:character_requested_as_educator }
-			num_of_relation_ward <= zz_valyria_max_wards
+			num_of_relation_ward <= 1
 		}
 	}
 

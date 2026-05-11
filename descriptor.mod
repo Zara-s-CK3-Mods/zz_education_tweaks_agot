@@ -4,5 +4,5 @@ tags={
 	"Events"
 }
 name="AGOT - Zara's Education Tweaks"
-supported_version="1.18.4"
+supported_version="1.19.0.4"
 remote_file_id="3645868409"
